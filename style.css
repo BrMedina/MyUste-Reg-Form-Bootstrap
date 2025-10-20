@@ -1,0 +1,58 @@
+:root{
+  --accent-blue: #309bcd;
+  --accent-gold: #f2ba0a;
+}
+
+.register-card{
+  position: relative;
+  z-index: 0; 
+  background: #f4f4f4;
+  border-radius: .5rem;
+  border: 1px solid rgba(0,0,0,0.08);
+  transition: transform .22s ease, box-shadow .28s ease, border-color .28s ease;
+  overflow: visible;
+}
+
+/* thin loading-like bar at the top of the registration form */
+.register-card::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;                           /* thin track */
+  background: rgba(48,155,205,0.10);     /* subtle track color */
+  border-top-left-radius: .5rem;
+  border-top-right-radius: .5rem;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* moving indicator (the "loading" fill) */
+.register-card::after{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;                            /* start off-left */
+  width: 40%;                            /* indicator width */
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform: translateX(0);              /* explicit start position */
+}
+
+/* slide animation for the indicator */
+@keyframes loadSlide {
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(300%); }   /* move across and out */
+}
+
+/* activate on hover: run once and keep final state while hovered */
+.register-card:hover::after{
+  opacity: 1;
+  animation: loadSlide 900ms linear 1 forwards; /* single run, remain at end */
+}
