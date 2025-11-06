@@ -50,7 +50,7 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <button class="btn btn-warning w-100 py-3" type="submit">Register</button>
+                                    <button class="btn btn-warning w-100 py-3" type="button" onclick="printOutput()">Register</button>
                                 </div>
                             </div>
                         </form>
@@ -60,4 +60,24 @@
         </div>
     </div>
 </body>
+
+<script>
+    
+
+    function printOutput() {
+    let firstName_BM = document.getElementById("firstName").value;
+    let lastName_BM = document.getElementById("lastName").value;
+    let email_BM = document.getElementById("email").value;
+    let studentNo_BM = document.getElementById("studentNo").value;
+    let birthDate_BM = document.getElementById("birthdate").value;
+    let termsnCon_BM = document.getElementById("termsnCon").checked;
+
+    console.log("First name: ", firstName_BM);
+    console.log("Last name: ", lastName_BM);
+    console.log("Email: ", email_BM);
+    console.log("Student number: " + studentNo_BM);
+    console.log("Birthdate: " + birthDate_BM);
+    console.log("Terms and Condition: " + termsnCon_BM);
+    }
+ </script>
 </html>
