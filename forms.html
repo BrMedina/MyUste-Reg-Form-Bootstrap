@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -21,63 +22,183 @@
                                 <div class="col-md-6">
                                     <label for="firstName" class="form-label">First name</label>
                                     <input type="text" class="form-control" id="firstName" name="firstName" required>
+                                    <div class="invalid-feedback">First name is required.</div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="lastName" class="form-label">Last name</label>
                                     <input type="text" class="form-control" id="lastName" name="lastName" required>
+                                    <div class="invalid-feedback">Last name is required.</div>
                                 </div>
 
                                 <div class="col-12">
                                     <label for="email" class="form-label">Email</label>
                                     <input type="email" class="form-control" id="email" name="email" required>
+                                    <div class="invalid-feedback">Please enter a valid email.</div>
                                 </div>
 
                                 <div class="col-12">
                                     <label for="studentNo" class="form-label">Student Number</label>
-                                    <input type="number" class="form-control" id="studentNo" name="studentNo" required>
+                                    <input type="text" inputmode="numeric" pattern="\d+" class="form-control" id="studentNo" name="studentNo" required>
+                                    <div class="invalid-feedback">Student number is required and must contain digits only.</div>
                                 </div>
 
                                 <div class="col-12">
                                     <label for="birthdate" class="form-label">Birthdate</label>
                                     <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+                                    <div class="invalid-feedback">Birthdate is required and cannot be in the future.</div>
                                 </div>
 
                                 <div class="col-12">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="termsnCon" name="termsnCon">
+                                        <input class="form-check-input" type="checkbox" id="termsnCon" name="termsnCon" required>
                                         <label class="form-check-label" for="termsnCon">I agree and abide by the university policies and terms and conditions.</label>
+                                        <div class="invalid-feedback" id="termsFeedback">You must agree before submitting.</div>
                                     </div>
                                 </div>
 
                                 <div class="col-12">
-                                    <button class="btn btn-warning w-100 py-3" type="button" onclick="printOutput()">Register</button>
+                                    <button class="btn btn-warning w-100 py-3" type="submit">Register</button>
                                 </div>
                             </div>
                         </form>
+
+                        <div id="result" class="mt-3" style="display:none;"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</body>
 
 <script>
-    
+(function () {
+    const form = document.getElementById('regForm');
+    const firstName = document.getElementById('firstName');
+    const lastName = document.getElementById('lastName');
+    const email = document.getElementById('email');
+    const studentNo = document.getElementById('studentNo');
+    const birthdate = document.getElementById('birthdate');
+    const terms = document.getElementById('termsnCon');
+    const termsFeedback = document.getElementById('termsFeedback');
+    const result = document.getElementById('result');
 
-    function printOutput() {
-    let firstName_BM = document.getElementById("firstName").value;
-    let lastName_BM = document.getElementById("lastName").value;
-    let email_BM = document.getElementById("email").value;
-    let studentNo_BM = document.getElementById("studentNo").value;
-    let birthDate_BM = document.getElementById("birthdate").value;
-    let termsnCon_BM = document.getElementById("termsnCon").checked;
+    (function setMaxBirthdate() {
+        const today = new Date().toISOString().split('T')[0];
+        birthdate.setAttribute('max', today);
+    })();
 
-    console.log("First name: ", firstName_BM);
-    console.log("Last name: ", lastName_BM);
-    console.log("Email: ", email_BM);
-    console.log("Student number: " + studentNo_BM);
-    console.log("Birthdate: " + birthDate_BM);
-    console.log("Terms and Condition: " + termsnCon_BM);
+    function setValid(el) {
+        el.classList.remove('is-invalid');
+        el.classList.add('is-valid');
     }
- </script>
+    function setInvalid(el) {
+        el.classList.remove('is-valid');
+        el.classList.add('is-invalid');
+    }
+
+    function validateAll() {
+        let valid = true;
+
+        // First name
+        const fn = firstName.value.trim();
+        if (!fn || fn.length < 2) {
+            setInvalid(firstName);
+            valid = false;
+        } else {
+            setValid(firstName);
+        }
+
+        // Last name
+        const ln = lastName.value.trim();
+        if (!ln) {
+            setInvalid(lastName);
+            valid = false;
+        } else {
+            setValid(lastName);
+        }
+
+        // Email
+        const em = email.value.trim();
+        if (!em || !email.checkValidity()) {
+            setInvalid(email);
+            valid = false;
+        } else {
+            setValid(email);
+        }
+
+        // Student number
+        const sn = studentNo.value.trim();
+        if (!sn || !/^\d{3,}$/.test(sn)) {
+            setInvalid(studentNo);
+            valid = false;
+        } else {
+            setValid(studentNo);
+        }
+
+        // Birthdate
+        if (!birthdate.value) {
+            setInvalid(birthdate);
+            valid = false;
+        } else {
+            const b = new Date(birthdate.value);
+            const today = new Date();
+            b.setHours(0,0,0,0); today.setHours(0,0,0,0);
+            if (b > today) {
+                setInvalid(birthdate);
+                valid = false;
+            } else {
+                setValid(birthdate);
+            }
+        }
+
+        // Terms
+        if (!terms.checked) {
+            setInvalid(terms);
+            termsFeedback.style.display = 'block';
+            valid = false;
+        } else {
+            setValid(terms);
+            termsFeedback.style.display = 'none';
+        }
+
+        return valid;
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!validateAll()) {
+            const firstInvalid = form.querySelector('.is-invalid');
+            if (firstInvalid && typeof firstInvalid.focus === 'function') firstInvalid.focus();
+            result.style.display = 'none';
+            return;
+        }
+
+        const data = {
+            firstName: firstName.value.trim(),
+            lastName: lastName.value.trim(),
+            email: email.value.trim(),
+            studentNo: studentNo.value.trim(),
+            birthdate: birthdate.value,
+            termsAccepted: terms.checked
+        };
+
+        console.log('Form submission:', data);
+
+        // pop up
+        alert(
+            'Registration successful!\n\n' +
+            'Name: ' + data.firstName + ' ' + data.lastName + '\n' +
+            'Email: ' + data.email + '\n' +
+            'Student No: ' + data.studentNo + '\n' +
+            'Birthdate: ' + data.birthdate
+        );
+
+        result.style.display = 'block';
+        result.className = 'alert alert-success';
+        result.textContent = 'Registration successful!';
+    }, false);
+})();
+</script>
+</body>
 </html>
